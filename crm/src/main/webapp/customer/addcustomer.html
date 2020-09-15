@@ -1,0 +1,95 @@
+<meta charset="utf-8" />
+<!-- 添加表单 -->
+<form id="fmaddcus" method="post"
+	style="width: 325px; margin: 0 auto; padding-top: 20px;">
+	<table border="0">
+		<tr>
+			<th><input hidden="hidden" type="text" name="cusId" /></th>
+		</tr>
+		<tr>
+			<th><label for="cusStatus">客户状态:</label></th>
+			<th>
+				<select class="easyui-combobox" name="cusStatus"
+				style="width: 200px;" data-options="panelHeight:95">
+					<option value=""></option>
+					<option value="1" selected="selected">正常</option>
+					<option value="0">不正常</option>
+			</select>
+			</th>
+		</tr>
+		<tr>
+			<th><label for="cusGrade">客户等级:</label></th>
+			<th>
+				<select class="easyui-combobox" name="cusGrade"
+				style="width: 200px;" data-options="required:true,panelHeight:204">
+					<option value="1">战略合作伙伴</option>
+					<option value="2">合作伙伴</option>
+					<option value="3">大客户</option>
+					<option value="4">重点开发客户</option>
+					<option value="5" selected="selected">普通客户</option>
+					<option value="6">VIP客户</option>
+			</select>
+			</th>
+		</tr>
+		<tr>
+			<th><label for="cusName">客户名字:</label></th>
+			<th><input class="easyui-textbox" type="text" name="cusName"
+				data-options="required:true" /></th>
+		</tr>
+		<tr>
+			<th><label for="cusArea">客户地区:</label></th>
+			<th><input class="easyui-textbox" type="text" name="cusArea"
+				data-options="required:true" /></th>
+		</tr>
+		<tr>
+			<th><label for="cusSatisfaction">客户满意度:</label></th>
+			<th><select class="easyui-combobox" name="cusSatisfaction"
+				style="width: 200px;" data-options="required:true,panelHeight:170">
+					<option value="1">很满意</option>
+					<option value="2">比较满意</option>
+					<option value="3">一般</option>
+					<option value="4">不满意</option>
+					<option value="5">很不满意</option>
+			</select></th>
+		</tr>
+		<tr>
+			<th><label for="cusCredit">客户信用度:</label></th>
+			<th><select class="easyui-combobox" name="cusCredit"
+				style="width: 200px;" data-options="panelHeight:170">
+					<option value="1">很诚信</option>
+					<option value="2">比较诚信</option>
+					<option value="3">一般</option>
+					<option value="4">不诚信</option>
+					<option value="5">很不诚信</option>
+			</select></th>
+		</tr>
+	</table>
+</form>
+<div style="text-align: center; padding: 5px">
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="subAddCustomer()">提交</a>
+	<a href="javascript:void(0)" class="easyui-linkbutton" 
+		onclick="clearForm(this)">取消</a>
+</div>
+
+<script>
+ 	function subAddCustomer(){
+ 		//校验表单有效字段值
+		if(!$("#fmaddcus").form("validate")){
+			return ;
+		}
+		$.ajax({
+			type:"get",
+			url:"addCustomer.do?"+$("#fmaddcus").serialize(),
+			success:function(obj){
+				if (obj=="success") {
+					$.messager.alert('提示','添加成功','info');
+					$("#tablelistcus").datagrid("reload");
+					$("#winaddcus").window("close");
+				} else {
+					$.messager.alert('提示','添加失败','error');
+				}
+			}
+		})
+ 	}
+</script>

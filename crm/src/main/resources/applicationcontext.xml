@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+   <!-- 连接数据库相关的设置 -->
+
+   <!-- 开启组件扫描 -->
+   <context:component-scan base-package="com.crm"></context:component-scan>
+   <!-- 加载属性文件 -->
+   <context:property-placeholder location="classpath:mysqldb.properties"/>
+   
+   <!-- 配置DataSource -->
+   <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!-- 属性的set注入 :
+            ${mysqlusername} , 引用mysqldb.properties属性文件中的内容
+        -->
+        <property name="user" value="${mysqlusername}"></property>
+        <property name="password" value="${mysqlpassword}"></property>
+        <property name="jdbcUrl" value="${mysqlurl}"></property>
+        <property name="driverClass" value="${mysqldriver}"></property>
+   </bean>
+   
+   <!-- 配置SqlSessionFactoryBean -->
+   <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 数据源的设置 -->
+   		<property name="dataSource" ref="dataSource"></property>
+   		<!-- 配置mybatis-config.xml -->
+   		<property name="configLocation"  value="classpath:mybatis-config.xml"></property>
+   		<!-- 自动扫描，指定路径下的mapper.xml文件 :
+   		       *.xml,指定路径下的任意xml文件。
+   		-->
+   		<property name="mapperLocations" 
+   		    value="classpath:com/crm/mapper/xml/*.xml"></property>
+   </bean>
+   
+   <!-- 
+                 配置org.mybatis.spring.mapper.MapperScannerConfigurer：
+          作用 ，就是将xxMapper.java自动扫描，在spring容器中可以使用到这些对象
+    -->
+   <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+       <property name="basePackage"  value="com.crm.mapper"></property>
+       <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+   </bean>
+   
+   <!-- 完成spring mvc相关的配置 ： 单独配置在spring-mvc.xml-->
+   
+</beans>

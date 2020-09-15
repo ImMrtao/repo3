@@ -1,0 +1,106 @@
+<meta charset="utf-8" />
+<div class="easyui-panel" style="padding: 5px;">
+	<a href="#" class="easyui-menubutton" title="你想根据什么条件来生成统计图"
+		data-options="menu:'#menu-report',iconCls:'icon-search'">客户属性</a> 
+	<a href="#" class="easyui-menubutton"
+		data-options="menu:'#menu-report2',iconCls:'icon-search'">图表类型</a>
+</div>
+<div id="menu-report" style="width: 100px;">
+	<div>客户状态</div>
+	<div>客户等级</div>
+	<div>客户地区</div>
+	<div>客户满意度</div>
+	<div>客户信誉度</div>
+</div>
+<div id="menu-report2" style="width: 100px;">
+	<div>柱状图</div>
+	<div>饼图</div>
+</div>
+
+<div id="main_parent">
+	<div id="main" style="width:700px;height:400px;
+			margin:0 auto;padding-top:120px;"></div>
+</div>
+<!-- h3 style="color:red;text-align: center;margin-top:300px;">此功能正在完善中</h3> -->
+<script type="text/javascript">
+	// 基于准备好的dom，初始化echarts实例
+	var myChart = echarts.init(document.getElementById('main'));
+	
+	var pfreport = "客户等级";//分组条件
+
+	// 指定图表的配置项和数据
+	var option = {
+		title: {
+			text: '客户统计图表'
+		},
+		tooltip:{},
+		legend: {
+			show: true,
+			data: [] //图例
+		},
+		xAxis: { //x坐标上的数据
+			name:pfreport,
+			nameLocation:"end",
+			nameTextStyle:{fontSize:18},
+			data: []
+		},
+		yAxis: {
+			name:"数量"
+		}, //y坐标上的数据（没有值就自动设置）
+		series: [{
+			name: '',
+			type: 'bar', //图表类型
+			data: [] //对应x坐标中的每个数据
+		}]
+		
+	};
+	
+	// 使用刚指定的配置项和数据显示图表。
+	myChart.setOption(option);
+
+	//当选择菜单中的选项被单击时，将条件保存到参数中
+	$("#menu-report div").click(function(){
+		pfreport = $(this).text();
+		getReport();
+	})
+	
+	//页面加载完成时获取客户数据
+	getReport();
+	
+	
+	function getReport(){
+		$.ajax({
+			type: "post",
+			url: "customerreport.do",
+			data:{"gcd":pfreport},
+			dataType: "json",
+			success: function(obj) {
+				var myArray = [];
+				var myLegend = [];
+				for(var i=0;i<obj.s.length;i++){
+					var j = {value:obj.s[i],name:obj.x[i]};
+					var j2 = {name:obj.x[i]};
+					myArray.push(j);
+					myLegend.push(j2);
+				}
+				console.log(obj.x);
+				console.log(myArray);
+				myChart.setOption({
+					legend: {
+						data: obj.x //["数量"]//图例
+					},
+					xAxis: { //x坐标上的数据
+						data: obj.x,
+						name:pfreport
+					},
+					series: [{
+						name: obj.x,
+						type: 'bar', //图表类型
+						data: myArray//obj.s// //对应x坐标中的每个数据
+					}]
+				});
+				//debugger;
+			}
+		})
+	}
+</script>

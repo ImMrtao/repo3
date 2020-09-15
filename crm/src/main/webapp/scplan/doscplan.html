@@ -1,0 +1,75 @@
+<meta charset="utf-8" />
+<form id="doScplanForm" method="post" style="width: 269px; margin: auto;">
+	<table cellpadding="5">
+		<tr>
+			<td>
+				<input type="text" name="cpId" hidden="hidden" />
+			</td>
+		</tr>
+		<tr>
+			<td>执行情况:</td>
+			<td><input class="easyui-textbox" type="text" name="cpPlancase"
+				data-options="required:true"></input></td>
+		</tr>
+		<tr>
+			<td>执行时间:</td>
+			<td><input class="easyui-datebox" name="cpPlandate"
+				data-options="formatter:plandateFormatter,parser:plandateMyparser"></input></td>
+		</tr>
+	</table>
+</form>
+<div style="text-align: center; padding: 5px">
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="doScplan()">提交</a>
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="clearForm(this)">取消</a>
+</div>
+<script>
+	//日期格式化
+	function plandateFormatter(date) {
+		var y = date.getFullYear();
+		var m = date.getMonth() + 1;
+		var d = date.getDate();
+		return y + '-' + (m < 10 ? ('0' + m) : m) + '-'
+				+ (d < 10 ? ('0' + d) : d);
+	}
+	function plandateMyparser(s) {
+		if (!s)
+			return new Date();
+		var ss = (s.split('-'));
+		var y = parseInt(ss[0], 10);
+		var m = parseInt(ss[1], 10);
+		var d = parseInt(ss[2], 10);
+		if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+			return new Date(y, m - 1, d);
+		} else {
+			return new Date();
+		}
+	}
+	
+	//回显数据
+	$(function(){
+		loadFormData($("#doScplanForm"),row);
+	})
+	
+	
+	//提交执行结果
+	function doScplan(){
+		if(!$("#doScplanForm").form("validate")){
+			return ;
+		}
+		$.ajax({
+			type:"get",
+			url:"doCustomerPlan.do?"+$("#doScplanForm").serialize(),
+			success:function(obj){
+				if (obj=="success") {
+					$.messager.alert('提示','保存成功','info');
+					$("#scplanTable").datagrid("reload");
+					$("#doScplanWindow").window("close");
+				} else {
+					$.messager.alert('提示','保存失败','error');
+				}
+			}
+		})
+	}
+</script>

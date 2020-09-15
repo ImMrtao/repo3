@@ -1,0 +1,84 @@
+<meta charset="utf-8" />
+<form id="finishScplanForm" method="post" style="width: 269px; margin: auto;">
+	<table cellpadding="5">
+		<tr>
+			<td>
+				<input type="text" name="cpId" hidden="hidden" />
+			</td>
+		</tr>
+			<td>
+				<input type="text" name="scId" hidden="hidden" />
+			</td>
+		<tr>
+			<td>执行情况:</td>
+			<td>
+				<select class="easyui-combobox" name="cpPlancase" style="width:200px;"
+					data-options="panelHeight:100">
+				    <option value="开发成功">开发成功</option>
+				    <option value="开发失败">开发失败</option>
+				</select>
+			</td>
+		</tr>
+	</table>
+</form>
+<div style="text-align: center; padding: 5px">
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="finishScplan()">提交</a>
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="clearForm(this)">取消</a>
+</div>
+<script>
+	//回显数据
+	$(function(){
+		loadFormData($("#finishScplanForm"),row);
+	})
+	
+	
+	//提交执行结果
+	function doScplan(){
+		if(!$("#finishScplanForm").form("validate")){
+			return ;
+		}
+		$.ajax({
+			type:"get",
+			url:"doCustomerPlan.do?"+$("#finishScplanForm").serialize(),
+			success:function(obj){
+				if (obj=="success") {
+					$.messager.alert('提示','保存成功','info');
+					$("#scplanTable").datagrid("reload");
+					$("#doScplanWindow").window("close");
+				} else {
+					$.messager.alert('提示','保存失败','error');
+				}
+			}
+		})
+	}
+	
+	//开发完成
+	function finishScplan(){
+		if(!$("#finishScplanForm").form("validate")){
+			$.messager.alert('警告','请填写完整！','warning');
+			return ;
+		}
+		var param = $("#finishScplanForm").serialize();
+		var newCustomer = "no";
+		$.messager.confirm('提示', '是否要保存为客户?', function(flag){
+			if (flag){
+				newCustomer = "yes";
+			}
+			$.ajax({
+				type:"get",
+				url:"finishCustomerPlan.do?"+$("#finishScplanForm").serialize()+"&newCustomer="+newCustomer,//是否转换为客户
+				success:function(obj){
+					if (obj=="success") {
+						$.messager.alert('提示','保存成功','info');
+						$("#scplanTable").datagrid("reload");
+						$("#finishScplanWindow").window("close");
+					} else {
+						$.messager.alert('提示','保存失败','error');
+					}
+				}
+			})
+		});
+	}
+</script>

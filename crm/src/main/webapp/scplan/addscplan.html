@@ -1,0 +1,74 @@
+<meta charset="utf-8" />
+<form id="addScplanForm" method="post" style="width: 269px; margin: auto;">
+	<table cellpadding="5">
+		<tr>
+			<td>客户:</td>
+			<td>
+				<!-- <select class="easyui-combobox" name="scId"></select> -->
+				<input class="easyui-combobox" name="scId"
+					data-options="url:'listSaleChanceToPlan.do',method:'get',
+					valueField:'scId',textField:'scCusname',panelHeight:'auto'">
+			</td>
+		</tr>
+		<tr>
+			<td>计划内容:</td>
+			<td><input class="easyui-textbox" type="text" name="cpContent"
+				data-options="required:true"></input></td>
+		</tr>
+		<tr>
+			<td>计划日期:</td>
+			<td><input class="easyui-datebox" name="cpDate"
+				data-options="formatter:myformatter,parser:myparser"></input></td>
+		</tr>
+	</table>
+</form>
+<div style="text-align: center; padding: 5px">
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="addScplan()">添加</a>
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="clearForm(this)">取消</a>
+</div>
+<script>
+	//日期格式化
+	function myformatter(date) {
+		var y = date.getFullYear();
+		var m = date.getMonth() + 1;
+		var d = date.getDate();
+		return y + '-' + (m < 10 ? ('0' + m) : m) + '-'
+				+ (d < 10 ? ('0' + d) : d);
+	}
+	function myparser(s) {
+		if (!s)
+			return new Date();
+		var ss = (s.split('-'));
+		var y = parseInt(ss[0], 10);
+		var m = parseInt(ss[1], 10);
+		var d = parseInt(ss[2], 10);
+		if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+			return new Date(y, m - 1, d);
+		} else {
+			return new Date();
+		}
+	}
+	
+	//提交添加的数据
+	//addCustomerPlan.do
+	function addScplan(){
+		if(!$("#addScplanForm").form("validate")){
+			return ;
+		}
+		$.ajax({
+			type:"get",
+			url:"addCustomerPlan.do?"+$("#addScplanForm").serialize(),
+			success:function(obj){
+				if (obj=="success") {
+					$.messager.alert('提示','添加成功','info');
+					$("#scplanTable").datagrid("reload");
+					$("#addScplanWindow").window("close");
+				} else {
+					$.messager.alert('提示','添加失败','error');
+				}
+			}
+		})
+	}
+</script>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>crm客户关系管理系统</title>
+
+		<link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+		<link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+		<script type="text/javascript" src="easyui/jquery.min.js"></script>
+		<script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+		<script type="text/javascript" src="easyui/locale/easyui-lang-zh_CN.js"></script>
+		<script type="text/javascript" src="js/echarts.js"></script>
+		<script src="js/index.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			a{/* 去除默认a标签样式 */
+				text-decoration: none;
+				color:green;
+			}
+			*{/* 不允许任何文字选中 */
+				user-select:none;
+			}
+			
+			#user-menu{
+				position: absolute;
+				display: none;
+				top: 20px;
+				right: 20px;
+				/*z-index: 1000;*/
+			}
+		</style>
+	</head>
+	<body class="easyui-layout">
+		<div data-options="region:'north',border:false,collapsible:false" 
+			style="height:60px;background:#B3DFDA;padding:10px;">
+				<div style="float:left;font-size: 30px;">crm客户关系管理系统</div>
+				<div style="float:right;font-size: 30px;">
+					<b id="uName"></b>,欢迎使用&nbsp;
+					<a href="javascript:void(0)" id="menu-button" class="easyui-menubutton"
+				    	data-options="menu:'#user-menu'" style="line-height: 30px;
+				    	font-weight: 900;">菜单</a>
+				</div>
+				<div id="user-menu" style="width:90px;">
+				    <div id="btn-exit">退了</div>
+				    <!-- <div>Cut</div>
+				    <div>Copy</div>
+				    <div>Paste</div>
+				    <div class="menu-sep"></div>
+				    <div data-options="iconCls:'icon-remove'">Delete</div>
+				    <div>Select All</div> -->
+				</div>
+		</div>
+			
+		<div data-options="region:'west',title:'菜单',collapsible:false" style="width:150px;padding:0px;">
+			<div id="sm" class="easyui-sidemenu" data-options="data:data,width:148,border:false"></div>
+		</div>
+		
+		<div data-options="region:'south',border:false,collapsible:false" style="height:50px;background:#A9FACD;padding:10px;">
+			<span>版权所有，侵权必究</span>
+		</div>
+		
+		<div data-options="region:'center',collapsible:false">
+			<div id="tt" class="easyui-tabs" data-options="fit:true,showHeader:false" style="width:500px;height:250px;">
+			    <div title="首页" style="padding:20px;display:none;">
+					欢迎使用客户管理系统
+			    </div>
+			</div>
+		</div>
+		
+		<script type="text/javascript">
+			var data = [{
+				text: '销售机会管理',
+				iconCls: 'icon-more',//图标
+				state: 'open',//菜单默认是展开还是折叠的状态
+				children: [{
+					text: '展示销售机会',
+					url:'salechance/listsalechance.html'
+				}]
+			},{
+				text: '销售计划管理',
+				iconCls: 'icon-more',//图标
+				state: 'open',//菜单默认是展开还是折叠的状态
+				children: [{
+					text: '展示销售计划',
+					url:'scplan/listscplan.html'
+				}]
+			}, {
+				text: '客户管理',
+				iconCls: 'icon-more',
+				selected: true,
+				children: [{
+					text: '客户基本信息',
+					url:'customer/listcustomer.html'
+				}, {
+					text: '客户联系人',
+					url:'cuscontact/listcustcontact.html'
+				}]
+			},{
+				text: '统计管理',
+				iconCls: 'icon-more',
+				selected: true,
+				children: [{
+					text: '客户统计信息',
+					url:'customerreport.html'
+				}]
+			}];
+			
+			/**/
+			
+			//菜单选中事件
+			$("#sm").sidemenu({
+				onSelect:function(item){
+					if (!$("#tt").tabs("exists",item.text)) {
+						$('#tt').tabs('add',{
+						    title:item.text,
+							href:item.url,
+							closable:true
+						});
+					} else{
+						$("#tt").tabs("select",item.text);
+					}
+				}
+			})
+			//退出系统
+			$("#btn-exit").parent().click(function(){
+				$.messager.confirm('退出', '确认退出吗?', function(flag){
+					if (flag){
+						window.location.href="exit.do";
+					}
+				});
+			})
+		</script>
+	</body>
+</html>

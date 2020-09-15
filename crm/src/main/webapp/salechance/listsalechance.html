@@ -1,0 +1,193 @@
+<meta charset="utf-8" />
+<div style="height:100%;width: 100%;">
+	<table id="tablesc" class="easyui-datagrid" data-options="pageSize:10,
+		pageList:[10,20,30],singleSelect:true,collapsible:true,url:'listSaleChance.do',
+		method:'get',pagination:true,toolbar:'#toolbarsc',fitColumns:true"
+		style="height: 100%;">
+		<thead>
+			<script>
+				
+			</script>
+			<tr>
+				<th data-options="field:'scId',width:80">Id</th>
+				<th data-options="field:'scCusname',width:80">机会名称</th>
+				<th data-options="field:'scComming',width:150">机会来源</th>
+				<th data-options="field:'scName',width:150">联系人</th>
+				<th data-options="field:'scPhone',width:100">联系电话</th>
+				<th data-options="field:'scSuccess',width:80">成功几率</th>
+				<th data-options="field:'scMessage',width:150">概要</th>
+				<th data-options="field:'scDesc',width:350">机会描述</th>
+				<th data-options="field:'scUser',width:70,styler: function(value,row,index){
+					return colHighlight(value);
+				}">创建人</th>
+				<th data-options="field:'scCreatetime',width:100">创建时间</th>
+				<th data-options="field:'scGiveuser',width:70,styler: function(value,row,index){
+					return colHighlight(value);
+				}">指派给谁</th>
+				<th data-options="field:'scGivetime',width:100">指派时间</th>
+				<th data-options="field:'scStatus',width:70,
+				formatter: function(value,row,index){
+					var statusCN = '';
+					if (value=='0'){
+						statusCN='未分配';
+					} else if (value=='1'){
+						statusCN='已分配';
+					} else if (value=='2'){
+						statusCN='开发成功';
+					} else if (value=='3'){
+						statusCN='开发失败';
+					}
+					return statusCN;
+				},styler: function(value,row,index){
+					return colHighlight2(value);
+				}">状态</th>
+			</tr>
+		</thead>
+	</table>
+	<div id="toolbarsc">
+		<a href="javascript:void(0)" id="btnaddsc" class="easyui-linkbutton" 
+			data-options="iconCls:'icon-edit',plain:true">添加</a>
+		<a href="javascript:void(0)" id="btndelsc" class="easyui-linkbutton" 
+			data-options="iconCls:'icon-edit',plain:true">删除</a>
+		<a href="javascript:void(0)" id="btneditsc" class="easyui-linkbutton" 
+			data-options="iconCls:'icon-edit',plain:true">编辑</a>
+		<a href="javascript:void(0)" id="btnfenpei" class="easyui-linkbutton orhide"  
+			data-options="iconCls:'icon-edit',plain:true">指派</a>
+	</div>
+	<!-- 指派按钮的显示和隐藏 -->
+	<script type="text/javascript">
+		if (user.rId==2) {
+			$("#btnfenpei").hide();//如果是客户经历登录系统，打开本页面的时候，默认隐藏指派按钮
+		}
+	</script>
+</div>
+
+<!-- 添加销售机会 -->
+<div id="windowaddsc" class="easyui-window" title="销售机会-添加" 
+	data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true,
+	href:'salechance/addsalechance.html'" style="width:450px;
+	height:500px;padding:10px;"></div>
+
+<!-- 修改销售机会的窗口 -->
+<div id="dialogeditsc" class="easyui-dialog" title="销售机会-修改" 
+	style="width:400px;height:440px;padding:15px;" data-options="iconCls:'icon-save',
+	resizable:true,modal:true,closed:true,href:'salechance/editsalechance.html'"></div>
+
+<!-- 指派销售机会的窗口 -->
+<div id="windowfenpei" class="easyui-window" title="销售机会-指派" 
+	data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true,
+	href:'salechance/fenpei.html'" style="width:330px;
+	height:200px;padding:10px;"></div>
+<script>
+	//单元格突出显示
+	function colHighlight(value,color){
+		if(value==user.uName){
+			return 'background-color:#FF8C00;color:white;';
+		}
+	}
+	
+	function colHighlight2(value,color){
+		var colColor;
+		if (value=='1'){
+			colColor='background-color:yellow;color:white;';
+		} else if (value=='2'){
+			colColor='background-color:limegreen;color:white;';
+		} else if (value=='3'){
+			colColor='background-color:red;color:white;';
+		}
+		return colColor;
+	}
+	
+
+	//添加销售机会
+	$("#btnaddsc").click(function(){
+		//弹出窗口
+		$("#windowaddsc").window("open");
+	})
+
+	//修改销售机会
+	$("#btneditsc").click(function() {
+		row = $("#tablesc").datagrid("getSelected");
+		if (row == null) {
+			$.messager.alert('警告',"请选择一行数据!",'warning');
+			return ;
+		}
+		if (row.scStatus!=0) {//只能修改状态为未分配的机会，其他状态的不能修改
+			$.messager.alert('警告',"该销售机会已经分配或开发完成，无法编辑！",'warning');
+			return ;
+		}
+		if (row.scUser!=user.uName) {
+			$.messager.alert('警告',"不是你创建的，你不能修改！",'warning');
+			return ;
+		}
+		/*回显数据*/
+		if ($("#dialogeditsc").html()!="") {
+			loadFormData($("#fmeditsc"),row);
+		}
+		$("#dialogeditsc").window("open");
+	})
+	
+	/*（5）删除销售机会，状态为：“未分配的销售机会可以删除”,删除的时候需要判断当前登录用户为该销售机会的创建人，否则是不可以删除的。*/
+	$("#btndelsc").click(function() {
+		var row = $("#tablesc").datagrid("getSelected");
+		
+		//判断是否选中数据
+		if(row==null){
+			$.messager.alert('警告',"请选中一行数据!",'warning');
+			return ;
+		}
+		//判断状态
+		if(row.scStatus==1){
+			$.messager.alert('警告',"该机会已分配，不能删除!",'warning');
+			return ;
+		}else if(row.scStatus==2 || row.scStatus==3){
+			$.messager.alert('警告',"该机会已开发完成，不能删除!",'warning');
+			return ;
+		}
+		//是否是用户创建的
+		if (row.scUser!=user.uName) {//用户已经选择数据，且状态为未分配
+			$.messager.alert('警告',"这不是你创建的机会，你不能删除!",'warning');
+			return ;
+		}
+		$.messager.confirm('删除机会', '是否确认删除?', function(flag){
+			if (flag){//用户单击确认后的动作
+				$.ajax({
+					type:"get",
+					url:"delSaleChance.do?scId="+row.scId,
+					success:function(data){
+						console.log("data:"+data);//删除的结果：删除成功或者是删除失败
+						if (data=="success") {
+							$.messager.alert('提示',"删除成功!",'info');
+							//刷新表格
+							$("#tablesc").datagrid("reload");
+						} else {
+							$.messager.alert('提示',"删除失败!",'error');
+						}
+					}
+				})
+			}
+		});
+	})
+	
+	/*
+		销售经理指派销售机会给客户经理
+			限制条件：只有销售经理才能分配销售机会、状态为未分配的销售机会
+			先从服务器获取到所有的客户经理的信息
+	*/
+	$("#btnfenpei").click(function(){
+		row = $("#tablesc").datagrid("getSelected");//加载选中行数据
+		if (row == null) {
+			$.messager.alert('警告',"请选择一行数据",'warning');
+			return ;
+		}
+		if (row.scStatus!=0) {//状态为未分配的机会才可被分配
+			$.messager.alert('警告',"该销售机会已经分配或开发完成，无法再次指派！",'warning');
+			return ;
+		}
+		if($("#windowfenpei").html()!=""){
+			loadFormData($("#fmfenpei"),row);//加载数据到表单
+		}
+		$("#windowfenpei").window("open");//打开弹出层
+	})
+	
+</script>

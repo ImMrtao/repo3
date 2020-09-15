@@ -1,0 +1,87 @@
+<meta charset="utf-8" />
+<div style="width: 100%;height: 100%;">
+	<table id="tableContact" class="easyui-datagrid" 
+		data-options="pageSize:10,pageList:[10,20,30,40,50],singleSelect:true,
+		collapsible:true,url:'listMyCustomerContact.do',method:'get',pagination:true,
+		fitColumns:true,toolbar:'#toolbarcontact'" style="height: 100%;">
+		<thead>
+			<tr>
+				<th data-options="field:'cusName',width:180">客户</th>
+				<th data-options="field:'cusconId',width:80">联系人id</th>
+				<th data-options="field:'cusId',width:100">客户id</th>
+				<th data-options="field:'cusconName',width:80,align:'right'">姓名</th>
+				<th data-options="field:'cusconSex',width:80,align:'right',formatter:
+				 function(value,row,index){
+					if (value=='1'){
+						return '男';
+					} else if(value=='2'){
+						return '女';
+					}else{
+						return '其他';
+					}}">性别</th>
+				<th data-options="field:'cusconPosition',width:250">职位</th>
+				<th data-options="field:'cusconOfficephone',width:250">办公电话</th>
+				<th data-options="field:'cusconPhone',width:250">电话</th>
+				<th data-options="field:'cusconNotes',width:250">备注信息</th>
+			</tr>
+		</thead>
+	</table>
+	<!-- 工具栏 -->
+	<div id="toolbarcontact">
+		<a href="javascript:void(0);" id="editContactBtn" class="easyui-linkbutton"
+		 data-options="iconCls:'icon-edit',plain:true">编辑</a>
+		<a href="javascript:void(0);" id="delContactBtn" class="easyui-linkbutton"
+		 data-options="iconCls:'icon-edit',plain:true">删除</a>
+	</div>
+	
+	<!-- 修改联系人的弹窗 -->
+	<div id="editContactWindow" class="easyui-window" title="客户联系人-编辑" 
+		style="width:600px;height:440px" data-options="iconCls:'icon-save'
+		,modal:true,closed:true,href:'cuscontact/editcustcontact.html'"></div>
+</div>
+<script>
+	/*
+		联系人的增删改查
+	*/
+	//编辑按钮的单击事件
+	$("#editContactBtn").click(function(){
+		row = $("#tableContact").datagrid("getSelected");
+		if(row==null){
+			$.messager.alert('警告','请选择一行数据!','warning');
+			return;
+		}
+		var flag = $("#editContactWindow").html();
+		//打开弹出层
+		$("#editContactWindow").window("open");
+		//加载选中的数据
+		if(flag != ""){
+			var obj = $("#editContactWindow");
+			loadFormData(obj,row);
+		}
+	})
+	
+	//删除联系人
+	$("#delContactBtn").click(function(){
+		row = $("#tableContact").datagrid("getSelected");
+		if(row==null){
+			$.messager.alert('警告','请选择一行数据!','warning');
+			return;
+		}
+		$.messager.confirm('删除', '确认删除该联系人?', function(flag){
+			if (flag){
+				$.ajax({
+					type:"get",
+					url:"delCustomerContact.do?cusconId="+row.cusconId,
+					success:function(obj){
+						if (obj=="success") {
+							$.messager.alert('提示','删除成功','info');
+							$("#tableContact").datagrid("reload");
+						} else {
+							$.messager.alert('提示','删除失败','error');
+						}
+					}
+				})
+			}
+		});
+	})
+</script>

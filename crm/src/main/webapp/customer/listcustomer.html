@@ -1,0 +1,184 @@
+<meta charset="utf-8" />
+<div style="width: 100%;height: 100%;">
+	<table id="tablelistcus" class="easyui-datagrid" 
+			data-options="url:'listCustomer.do',pagination:true,pageSize:10,pageList:[10,20,30],
+			fitColumns:true,singleSelect:true,toolbar:'#tbcus'" style="height: 100%;">
+	    <thead>
+			<tr>
+				<th data-options="field:'cusId',width:20">客户id</th>
+				<th data-options="field:'cusStatus',width:30
+					,formatter: function(value,row,index){
+						var cusStatusCN='';
+						if (value=='1'){
+							cusStatusCN='正常';
+						} else {
+							cusStatusCN='非正常';
+						}
+						return cusStatusCN;
+					}">客户状态</th>
+				<th data-options="field:'cusGrade',width:20,align:'right',
+					formatter:function(value,row,index){return cusGradeFormat(value);}">客户等级</th>
+				<th data-options="field:'cusName',width:100">客户名</th>
+				<th data-options="field:'cusArea',width:40,align:'right'">客户地区</th>
+				<th data-options="field:'cusSatisfaction',width:100,
+					formatter:function(value,row,index){
+						return cusSatisfactionFormat(value);
+					}">客户满意度</th>
+				<th data-options="field:'cusCredit',width:100,
+					formatter:function(value,row,index){
+						return cusCreditFormat(value);
+					}">客户信用度</th>
+			</tr>
+	    </thead>
+	</table>
+	<!-- 工具栏 -->
+	<div id="tbcus">
+		<a href="javascript:void(0)" id="btneditcus" class="easyui-linkbutton" 
+			data-options="iconCls:'icon-edit',plain:true">编辑</a>
+		<a href="javascript:void(0)" id="btnaddcus" class="easyui-linkbutton" 
+			data-options="iconCls:'icon-edit',plain:true">添加</a>
+		<a href="javascript:void(0)" id="addContactBtn" class="easyui-linkbutton" 
+			data-options="iconCls:'icon-edit',plain:true">添加联系人</a>
+	</div>
+	
+	<!-- 编辑客户信息 -->
+	<div id="dialogeditcus" class="easyui-dialog" title="编辑客户基本信息"
+		style="width:430px;height:360px;" data-options="iconCls:'icon-save'
+			,resizable:true,modal:true,closed:true,href:'customer/editcustomer.html'"></div>
+
+	<!-- 添加客户信息的弹窗 -->
+	<div id="winaddcus" class="easyui-window" title="My Window"
+		style="width:430px;height:360px" data-options="iconCls:'icon-save'
+			,modal:true,closed:true,href:'customer/addcustomer.html'"></div>
+	
+	<!-- 添加联系人的弹窗 -->
+	<div id="addContactWindow" class="easyui-window" title="客户联系人-添加" 
+		style="width:600px;height:440px" data-options="iconCls:'icon-save'
+		,modal:true,closed:true,href:'cuscontact/addcustcontact.html'"></div>
+</div>
+
+<script>
+	//单击添加按钮，弹出添加窗口
+	$("#btnaddcus").click(function(){
+		$("#winaddcus").window("open");//弹出窗口
+	})
+	
+	//添加联系人
+	$("#addContactBtn").click(function(){
+		row = $("#tablelistcus").datagrid("getSelected");//获取需要添加联系人的客户id
+		if (row==null) {
+			$.messager.alert('警告',"请选择一行数据!",'warning');
+			return ;
+		}
+		var flag = $("#addContactWindow").html();
+		//打开弹窗
+		$("#addContactWindow").window("open");
+		if (flag != "") {
+			loadFormData($("#addContactForm"),row);
+		}
+		
+	})
+	
+	//修改客户信息
+	$("#btneditcus").click(function(){
+		row = $("#tablelistcus").datagrid("getSelected");
+		
+		if (row!=null&&row.cusStatus==1) {
+			var flag = $("#dialogeditcus").html();
+			$("#dialogeditcus").window("open");
+			//回显数据:第一次加载窗口内容时不执行if语句内的代码
+			if(flag!=""){
+				loadFormData($("#fmeditcus"),row);
+			}
+		}else{
+			var msgstr="请选择有效数据!";
+			if(row!=null){
+				msgstr="该客户处于非正常状态，无法修改！";
+			}
+			$.messager.alert('警告',msgstr,'warning');
+		}
+	})
+	
+	//客户等级中文格式化
+	function cusGradeFormat(value){
+		var str = "";
+		switch (value) {
+			case 1:
+				str = "战略合作伙伴";
+				break;
+			case 2:
+				str = "合作伙伴";
+				break;
+			case 3:
+				str = "大客户";
+				break;
+			case 4:
+				str = "重点开发客户";
+				break;
+			case 5:
+				str = "普通客户";
+				break;
+			case 6:
+				str = "VIP客户";
+				break;
+			default:
+				str = "普通客户";
+				break;
+		}
+		return str;
+	}
+	
+	//客户满意度中文格式化
+	function cusSatisfactionFormat(value){
+		var str = "";
+		switch (value) {
+			case 1:
+				str = "很满意";
+				break;
+			case 2:
+				str = "比较满意";
+				break;
+			case 3:
+				str = "一般";
+				break;
+			case 4:
+				str = "不满意";
+				break;
+			case 5:
+				str = "很不满意";
+				break;
+			default:
+				str = "比较满意";
+				break;
+		}
+		return str;
+	}
+	
+	//客户信誉度中文格式化
+	function cusCreditFormat(value){
+		var str = "";
+		switch (value) {
+			case 1:
+				str = "很诚信";
+				break;
+			case 2:
+				str = "比较诚信";
+				break;
+			case 3:
+				str = "一般";
+				break;
+			case 4:
+				str = "不诚信";
+				break;
+			case 5:
+				str = "很不诚信";
+				break;
+			default:
+				str = "很诚信";
+				break;
+		}
+		return str;
+	}
+	
+</script>
+

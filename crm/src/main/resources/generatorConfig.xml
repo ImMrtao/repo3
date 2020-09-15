@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+  <context id="context1" targetRuntime="MyBatis3">
+    <!-- jdbc连接数据库 -->
+    <jdbcConnection connectionURL="jdbc:mysql://localhost:3306/crm?useUnicode=true&amp;characterEncoding=utf-8"
+        driverClass="com.mysql.jdbc.Driver" password="" userId="root" />
+    <!-- 实体类 -->
+    <javaModelGenerator targetPackage="com.crm.entity"  targetProject="crm/src/main/java" />
+    <!-- mapper.xml -->
+    <sqlMapGenerator targetPackage="com.crm.mapper.xml" targetProject="crm/src/main/java"></sqlMapGenerator>
+    <!-- mapper.java -->
+    <javaClientGenerator targetPackage="com.crm.mapper" targetProject="crm/src/main/java" type="XMLMAPPER" />
+    <table tableName="role">
+      <!-- 表中的字段名和实体类的列名的对应关系 
+      <columnOverride column="???" property="???" /> -->
+    </table>
+  </context>
+</generatorConfiguration>

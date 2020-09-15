@@ -1,0 +1,50 @@
+<meta charset="utf-8" />
+<form id="fmfenpei" method="post" 
+	style="width:259px;margin:0 auto 0 auto;">
+	<table cellpadding="5">
+		<tr>
+			<td>机会id:</td>
+			<td><input class="easyui-textbox" type="text" name="scId"
+				data-options="required:true"></input></td>
+		</tr>
+		<tr>
+			<td>指派给谁:</td>
+			<td>
+				<input id="cusmans" class="easyui-combobox" name="scGiveuser"
+					data-options="valueField:'uName',textField:'uName',url:'selectfenpeiMan.do',
+					panelHeight:100">
+			</td>
+		</tr>
+	</table>
+</form>
+<div style="text-align: center; padding: 5px">
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="fenpeiSc()">指派</a>
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="clearForm(this)">取消</a>
+</div>
+<script>
+	$(function(){
+		loadFormData($("#fmfenpei"),row);
+	})
+	
+	
+	function fenpeiSc(){
+		if(!$("#fmfenpei").form("validate")){
+			return ;
+		}
+		$.ajax({
+			type:"get",
+			url:"fenpeiSaleChance.do?"+$("#fmfenpei").serialize(),//data-url=""
+			success:function(obj){
+				if (obj=="success") {
+					$.messager.alert('提示','修改成功','info');
+					$("#tablesc").datagrid("reload");
+					$("#windowfenpei").window("close");
+				} else {
+					$.messager.alert('提示','修改失败','error');
+				}
+			}
+		})
+	}
+</script>

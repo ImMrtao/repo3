@@ -1,0 +1,73 @@
+<meta charset="utf-8" />
+<form id="fmeditsc" method="post"
+	style="width: 225px; margin: 0 auto; padding-top: 20px;"
+	data-url="updateSaleChance.do">
+	<table border="0">
+		<tr>
+			<!-- 机会来源，客户名称，成功几率，概要，联系人，联系人电话，机会描述 -->
+			<th><input hidden="hidden" type="text" name="scId" /></th>
+		</tr>
+		<tr>
+			<th><label for="scCusname">客户名称:</label></th>
+			<th><input class="easyui-textbox" type="text" name="scCusname" /></th>
+		</tr>
+		<tr>
+			<th><label for="scComming">机会来源:</label></th>
+			<th><input class="easyui-textbox" type="text" name="scComming" /></th>
+		</tr>
+		<tr>
+			<th><label for="scSuccess">成功几率:</label></th>
+			<th><input class="easyui-textbox" type="text" name="scSuccess" /></th>
+		</tr>
+		<tr>
+			<th><label for="scMessage">概要:</label></th>
+			<th><input class="easyui-textbox" type="text" name="scMessage" /></th>
+		</tr>
+		<tr>
+			<th><label for="scName">联系人:</label></th>
+			<th><input class="easyui-textbox" type="text" name="scName" /></th>
+		</tr>
+		<tr>
+			<th><label for="scPhone">联系人电话:</label></th>
+			<th><input class="easyui-textbox" type="text" name="scPhone" /></th>
+		</tr>
+		<tr>
+			<th><label for="scDesc">机会描述:</label></th>
+			<th><input class="easyui-textbox" type="text" name="scDesc" /></th>
+		</tr>
+	</table>
+</form>
+<div style="text-align: center; padding: 5px">
+	<a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="editSc()">提交</a> <a href="javascript:void(0)"
+		class="easyui-linkbutton" onclick="clearForm(this)">取消</a>
+</div>
+<script>
+	$(function(){
+		//加载数据到表单中
+		loadFormData($("#fmeditsc"),row);
+	})
+	
+	//提交修改内容
+	function editSc(){
+		if(!$("#fmeditsc").form("validate")){
+			return ;
+		}
+		$.ajax({
+			type:"get",
+			url:"updateSaleChance.do?"+$("#fmeditsc").serialize(),//data-url=""
+			success:function(obj){
+				if (obj=="success") {
+					$.messager.alert('提示','修改成功','info');
+					$("#tablesc").datagrid("reload");
+					$("#dialogeditsc").window("close");
+				} else {
+					$.messager.alert('提示','修改失败','error');
+				}
+			}
+		})
+	}
+</script>
+
+
+
